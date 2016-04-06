@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html ng-app="canaryApp" class="uk-height-1-1">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    <title>Canary: The Reddit Robin Clone</title>
+
+    <link rel="stylesheet" href="lib/css/uikit.almost-flat.min.css">
+
+    <style type="text/css">
+      .box {
+        display: flex;
+        flex-flow: column;
+        height: 100%;
+      }
+
+      .chatBox {
+        position: fixed;
+        bottom: 10px;
+      }
+
+      .header {
+        width: 100%;
+        height: 40px;
+        background-color: white;
+        position: fixed;
+        top: 0px;
+        left: 0px;
+      }
+
+      .filler {
+        height: 42px;
+      }
+    </style>
+
+    <script src="lib/js/jquery-2.2.2.min.js"></script>
+    <script src="lib/js/uikit.min.js"></script>
+    <script src="lib/js/core/nav.min.js"></script>
+    <script src="lib/js/angular.min.js"></script>
+    <script src="lib/js/angular-animate.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="index.js"></script>
+  </head>
+  <body ng-controller="CanaryController" class="uk-height-1-1 box">
+    <nav class="uk-navbar uk-navbar-attached header">
+
+      <ul class="uk-navbar-nav header" data-uk-tab>
+        <li class="uk-active" ng-if="currentPage == 'chat'"><a>Chat</a></li>
+
+        <li class="uk-navbar-flip" data-uk-dropdown="{mode:'click'}" ng-if="currentPage == 'chat'">
+          <a>WIP Vote</a>
+
+          <div class="uk-dropdown uk-dropdown-small">
+            <ul class="uk-nav uk-nav-dropdown">
+              <li><a>Abstain</a></li>
+              <li><a>Stay Strong</a></li>
+              <li><a>Grow</a></li>
+              <li><a ng-click="abandon()">Abandon Ship</a></li>
+            </ul>
+          </div>
+        </li>
+
+        <div class="uk-navbar-content uk-navbar-center uk-h2">{{getTitle()}}</dvi>
+      </ul>
+    </nav>
+
+    <div class="filler"></div>
+
+    <form class="chatBox uk-form uk-container" ng-if="currentPage == 'chat'" ng-submit="chat.sendMessage()">
+      <input type="text" class="uk-form-width-large" placeholder="Chat Message" ng-model="chat.message">
+      <button class="uk-button uk-button-success" ng-disabled="chat.formValid()">Send</button>
+    </form>
+
+    <noscript>Please enable JavaScript / Update your browser</noscript>
+
+    <div class="uk-container" ng-if="currentPage == 'init'">
+      Canary is loading. Please wait.
+    </div>
+
+    <div class="uk-container" ng-if="currentPage == 'disconnected'">
+      Disconnected from server. Attempting to reconnect...
+    </div>
+
+    <div class="uk-container uk-container-center" ng-if="currentPage == 'button'">
+      <br>
+      <button class="uk-button uk-button-primary" ng-click="pressIt()">Join Canary</button>
+    </div>
+
+    <div class="uk-container messagesBox" ng-if="currentPage == 'chat'">
+      <div>
+        <table class="uk-table">
+          <tr ng-repeat="(key, value) in chat.messages">
+            <td>{{value}}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="uk-container" ng-if="currentPage == 'account'">
+      Make a Canary account to login. Passwords are hashed with bcrypt.
+
+      <form novalidate class="uk-form">
+        <div class="uk-form-row uk-form-icon">
+          <i class="uk-icon-user"></i>
+          <input type="text" class="uk-form-width-large" placeholder="Username" ng-model="user.username">
+        </div>
+
+        <div class="uk-form-row uk-form-icon">
+          <i class="uk-icon-lock"></i>
+          <input type="password" class="uk-form-width-large" placeholder="Password" ng-model="user.password">
+        </div>
+
+        <div class="uk-form-row">
+          <button class="uk-button uk-button-primary" ng-click="user.login()" ng-disabled="user.formValid()">
+            Register / Login
+          </button>
+        </div>
+
+        <div class="uk-form-row">
+          <p>{{user.errorText}}</p>
+        </div>
+      </form>
+    </div>
+  </body>
+<html>

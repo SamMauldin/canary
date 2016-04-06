@@ -1,0 +1,21 @@
+{
+  "name": "fld-canary",
+  "version": "1.0.0",
+  "description": "Fluidnode Canary",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "Sam Mauldin",
+  "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
+    "express": "4.13.4",
+    "fld-rethinkdb": "1.0.0",
+    "node-uuid": "1.4.7",
+    "socket.io": "1.4.5",
+    "validator": "5.1.0"
+  },
+  "devDependencies": {
+    "mocha": "2.4.5"
+  }
+}
