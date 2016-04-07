@@ -89,7 +89,7 @@
     <div class="uk-container messagesBox" ng-if="currentPage == 'chat'">
       <div>
         <table class="uk-table">
-          <tr ng-repeat="(key, value) in chat.messages">
+          <tr ng-repeat="(key, value) in chat.messages track by $index">
             <td>{{value}}</td>
           </tr>
         </table>
