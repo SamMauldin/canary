@@ -58,12 +58,12 @@ setInterval(function() {
               return Promise.resolve(1);
             }).then(function() {
               if (usersInRoom > 0 && voteGrow > (usersInRoom / 2)) {
-                if (roomTiers[room.id]) {
-                  r.systemSendMessage(roomTiers[room.id], "Merge Incoming", function() {});
+                if (roomTiers[room.tier]) {
+                  r.systemSendMessage(roomTiers[room.tier], "Merge Incoming", function() {});
                   r.systemSendMessage(room.id, "Merge Incoming", function() {});
 
                   r.db("canary").table("accounts").filter({
-                    currentRoom: roomTiers[room.id]
+                    currentRoom: roomTiers[room.tier]
                   }).update({
                     currentRoom: room.id
                   }).run();
@@ -71,9 +71,9 @@ setInterval(function() {
                   r.db("canary").table("rooms").get(room.id).update({
                     tier: room.tier + 1
                   }).run().then(roomDone);
-                  delete roomTiers[room.id];
+                  delete roomTiers[room.tier];
                 } else {
-                  roomTiers[room.id] = room.id;
+                  roomTiers[room.tier] = room.id;
                 }
               } else if (usersInRoom == 0) {
                 r.db("canary").table("rooms").get(room.id).delete().run().then(roomDone);
