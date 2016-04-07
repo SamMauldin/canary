@@ -1,4 +1,4 @@
-var r = require("fld-rethinkdb")([{host:"192.168.100.7"}]);
+var r = require("fld-rethinkdb")([{host:"192.168.100.7"},{host:"192.168.100.2"},{host:"192.168.100.5"}]);
 var bcrypt = require("bcrypt-nodejs");
 var serverUUID = require("node-uuid")();
 
