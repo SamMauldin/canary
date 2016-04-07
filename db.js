@@ -74,6 +74,23 @@ r.saveUser = function(user, cb) {
   });
 };
 
+r.systemSendMessage = function(toRoom, msg, cb) {
+  r.db("canary").table("messages").insert({
+    from: "Canary-System",
+    message: msg,
+    created: r.now(),
+    room: toRoom
+  }).run().then(function(res) {
+    if (res.inserted == 1) {
+      cb(res.generated_keys[0]);
+    } else {
+      cb(null, "Database Error");
+    }
+  }).catch(function(err) {
+    cb(null, err);
+  });
+};
+
 r.sendMessage = function(user, msg, cb) {
   r.db("canary").table("messages").insert({
     from: user.username,

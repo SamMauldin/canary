@@ -36,14 +36,14 @@ canaryApp.controller("CanaryController", function($scope) {
     socket.emit("abandon");
   };
 
+  $scope.grow = function() {
+    socket.emit("voteGrow");
+  };
+
   $scope.chat = {
     messages: [],
     message: ""
   };
-
-  for (var i = 0; i < 1000; i++) {
-    $scope.chat.messages.push(i);
-  }
 
   $scope.chat.formValid = function() {
     return $scope.chat.message.length < 1;
@@ -97,6 +97,11 @@ canaryApp.controller("CanaryController", function($scope) {
       $scope.currentPage = "account";
       $scope.$apply();
     }
+  });
+
+  socket.on("chat", function(from, message) {
+    $scope.chat.messages.push(from + ": " + message);
+    $scope.$apply();
   });
 
   socket.on("disconnect", function() {

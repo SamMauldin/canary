@@ -41,37 +41,47 @@ setInterval(function() {
 
       var roomTiers = {};
 
-      cursor.eachAsync(function(room, roomFinished) {
+      cursor.eachAsync(function(room) {
 
         var usersInRoom = 0;
         var voteGrow = 0;
+        var roomPromise = new Promise(function(roomDone, roomError) {
 
-        r.db("canary").table("accounts").filter({
-          currentRoom: room.id
-        }).run({cursor: true}).then(function(cursor) {
-          cursor.eachAsync(function(user, userFinished) {
-            usersInRoom++;
-            if (user.voteGrow) {
-              voteGrow++;
-            }
-            console.log(userFinished);
-          }).then(function() {
-            if (usersInRoom > 0 && voteGrow > (usersInRoom / 2)) {
-              r.db("canary").table("accounts").filter({
-                currentRoom: roomTiers[room.id]
-              }).update({
-                currentRoom: room.id
-              }).run();
+          r.db("canary").table("accounts").filter({
+            currentRoom: room.id
+          }).run({cursor: true}).then(function(cursor) {
+            cursor.eachAsync(function(user) {
+              usersInRoom++;
+              if (user.voteGrow) {
+                voteGrow++;
+              }
+              return Promise.resolve(1);
+            }).then(function() {
+              if (usersInRoom > 0 && voteGrow > (usersInRoom / 2)) {
+                if (roomTiers[room.id]) {
+                  r.systemSendMessage(roomTiers[room.id], "Merge Incoming", function() {});
+                  r.systemSendMessage(room.id, "Merge Incoming", function() {});
 
-              r.db("canary").table("rooms").get(room.id).update({
-                tier: room.tier + 1
-              }).run().then(roomFinished);
+                  r.db("canary").table("accounts").filter({
+                    currentRoom: roomTiers[room.id]
+                  }).update({
+                    currentRoom: room.id
+                  }).run();
 
-              delete roomTiers[room.id];
-            } else {
-              r.db("canary").table("rooms").get(room.id).delete().run().then(roomFinished);
-            }
+                  r.db("canary").table("rooms").get(room.id).update({
+                    tier: room.tier + 1
+                  }).run().then(roomDone);
+                  delete roomTiers[room.id];
+                } else {
+                  roomTiers[room.id] = room.id;
+                }
+              } else if (usersInRoom == 0) {
+                r.db("canary").table("rooms").get(room.id).delete().run().then(roomDone);
+              }
+            });
           });
+
+          return roomPromise;
         });
       });
     });

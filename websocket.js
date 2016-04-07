@@ -80,6 +80,15 @@ module.exports = function(server) {
       }
     });
 
+    socket.on("voteGrow", function() {
+      user.voteGrow = true;
+      r.saveUser(user, function(res, err) {
+        if (err) {
+          socket.emit("err", err);
+        }
+      });
+    });
+
     var registerEvent = function() {
       if (connected && !event && user.currentRoom) {
         event = true;
